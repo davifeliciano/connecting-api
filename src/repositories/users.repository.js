@@ -53,6 +53,26 @@ class UserRepository {
       client.release();
     }
   }
+
+  static async follow(followerId, leaderId) {
+    const text = `
+      INSERT INTO followers
+        (follower_id, leader_id)
+      VALUES
+        ($1, $2)
+    `;
+
+    await pool.query(text, [followerId, leaderId]);
+  }
+
+  static async unfollow(follower_id, leader_id) {
+    const text = `
+      REMOVE FROM followers
+      WHERE follower_id = $1 AND leader_id = $2
+    `;
+
+    await pool.query(text, [follower_id, leader_id]);
+  }
 }
 
 export default UserRepository;
