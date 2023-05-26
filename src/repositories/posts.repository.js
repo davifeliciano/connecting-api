@@ -41,6 +41,26 @@ class PostsRepository {
       client.release();
     }
   }
+
+  static async like(userId, postId) {
+    const text = `
+      INSERT INTO post_likes
+        (author, post_id)
+      VALUES
+        ($1, $2)
+    `;
+
+    await pool.query(text, [userId, postId]);
+  }
+
+  static async unlike(userId, postId) {
+    const text = `
+      DELETE FROM post_likes
+      WHERE author = $1 AND post_id = $2
+    `;
+
+    await pool.query(text, [userId, postId]);
+  }
 }
 
 export default PostsRepository;
