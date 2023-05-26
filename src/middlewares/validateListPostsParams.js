@@ -1,8 +1,15 @@
 import Joi from "joi";
 
 export default function validateListPostsParams(req, res, next) {
+  const authorMessage =
+    '"author" must have between 3 and 32 characters (letters, numbers, - and _ are allowed)';
+
   const schema = Joi.object({
     following: Joi.boolean().default(false),
+    author: Joi.string()
+      .pattern(/^[\w-]{3,32}$/)
+      .message(authorMessage)
+      .required(),
     startId: Joi.number().integer().positive().default(false),
     startTimestamp: Joi.date().default(false),
   });

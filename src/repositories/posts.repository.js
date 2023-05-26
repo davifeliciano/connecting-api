@@ -5,10 +5,20 @@ class PostsRepository {
   static async list(userId, options) {
     const whereConditions = [];
     const values = [userId];
+    let placeholder = 2;
 
     if (options?.startTimestamp && options?.startId) {
-      whereConditions.push("(p.created_at, p.id) < ($2, $3)");
+      whereConditions.push(
+        `(p.created_at, p.id) < ($${placeholder}, $${placeholder + 1})`
+      );
+
       values.push(options.startTimestamp, options.startId);
+      placeholder += 2;
+    }
+
+    if (options?.author) {
+      whereConditions.push(`u.username = $${placeholder}`);
+      values.push(options.author);
     }
 
     if (options?.following === true) {
