@@ -1,5 +1,17 @@
 import PostsRepository from "../repositories/posts.repository.js";
-import { createPost } from "../services/posts.services.js";
+import { createPost, listPosts } from "../services/posts.services.js";
+
+export async function listPostsController(req, res) {
+  const { user, listOptions } = res.locals;
+
+  try {
+    const posts = await listPosts(user.id, listOptions);
+    return res.send(posts);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+}
 
 export async function createPostController(req, res) {
   const { user } = res.locals;
