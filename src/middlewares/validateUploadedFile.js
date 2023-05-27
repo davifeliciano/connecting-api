@@ -28,24 +28,26 @@ const upload = multer({
 
 const getUploadedImageMiddleware = upload.single("image");
 
-export default function validatePostFile(req, res, next) {
-  getUploadedImageMiddleware(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      return res
-        .status(422)
-        .send({ detail: "Max upload size of 10MiB reached" });
-    }
+export default function validateUploadedFile(requireFile = false) {
+  return (req, res, next) => {
+    getUploadedImageMiddleware(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        return res
+          .status(422)
+          .send({ detail: "Max upload size of 10MiB reached" });
+      }
 
-    if (err instanceof FileTypeNotAllowedError) {
-      return res.status(422).send({
-        detail: "Only jpeg, png, webp, aviff and svg files are allowed",
-      });
-    }
+      if (err instanceof FileTypeNotAllowedError) {
+        return res.status(422).send({
+          detail: "Only jpeg, png, webp, aviff and svg files are allowed",
+        });
+      }
 
-    if (!req.file) {
-      return res.status(422).send({ detail: "Image file is required" });
-    }
+      if (requireFile && !req.file) {
+        return res.status(422).send({ detail: "Image file is required" });
+      }
 
-    next();
-  });
+      next();
+    });
+  };
 }

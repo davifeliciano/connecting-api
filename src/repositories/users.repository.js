@@ -54,6 +54,49 @@ class UserRepository {
     }
   }
 
+  static async update(userId, name, bio, filename) {
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      const updateProfileText = `
+        UPDATE profiles
+        SET
+          name = $2,
+          bio = $3
+        WHERE
+          user_id = $1
+      `;
+
+      const updateProfileValues = [userId, name, bio];
+      await client.query(updateProfileText, updateProfileValues);
+
+      if (filename) {
+        const updateUserImageText = `
+          INSERT INTO user_images
+            (user_id, filename)
+          VALUES
+            ($1, $2)
+          ON CONFLICT(user_id) DO UPDATE
+          SET
+            user_id = $1,
+            filename = $2,
+            updated_at = now()
+        `;
+
+        await client.query(updateUserImageText, [userId, filename]);
+      }
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   static async follow(followerId, leaderId) {
     const text = `
       INSERT INTO followers

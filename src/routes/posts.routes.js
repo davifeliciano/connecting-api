@@ -1,7 +1,7 @@
 import { Router } from "express";
 import validateAuthentication from "../middlewares/validateAuthentication.js";
 import validateBody from "../middlewares/validateBody.js";
-import validatePostFile from "../middlewares/validatePostFile.js";
+import validatePostFile from "../middlewares/validateUploadedFile.js";
 import validateId from "../middlewares/validateId.js";
 import validateListPostsParams from "../middlewares/validateListPostsParams.js";
 import { postSchema } from "../schemas/posts.schemas.js";
@@ -18,7 +18,7 @@ postsRouter.use(validateAuthentication);
 
 postsRouter.post(
   "/",
-  validatePostFile,
+  validatePostFile(true),
   validateBody(postSchema),
   createPostController
 );

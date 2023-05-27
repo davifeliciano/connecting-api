@@ -1,4 +1,3 @@
-import sharp from "sharp";
 import crypto from "crypto";
 import {
   GetObjectCommand,
@@ -8,40 +7,12 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { bucketName, client } from "../aws/s3.js";
 import PostsRepository from "../repositories/posts.repository.js";
-
-async function editImage(buffer) {
-  const imageSize = 1080;
-
-  const backgroundPromise = sharp(buffer)
-    .resize(imageSize, imageSize, {
-      fit: "cover",
-    })
-    .blur(5)
-    .modulate({ brightness: 0.5 })
-    .png()
-    .toBuffer();
-
-  const imagePromise = sharp(buffer)
-    .resize(imageSize, imageSize, { fit: "contain", background: "transparent" })
-    .png()
-    .toBuffer();
-
-  const [background, image] = await Promise.all([
-    backgroundPromise,
-    imagePromise,
-  ]);
-
-  return sharp(background)
-    .composite([{ input: image }])
-    .withMetadata()
-    .webp()
-    .toBuffer();
-}
+import editImage from "./utils/editImage.js";
 
 export async function createPost(userId, { caption }, file) {
   const editedImageBuffer = await editImage(file.buffer);
   const uuid = crypto.randomUUID();
-  const filename = uuid + ".webp";
+  const filename = "posts/" + uuid + ".webp";
 
   const putCommand = new PutObjectCommand({
     Bucket: bucketName,

@@ -1,4 +1,24 @@
 import UserRepository from "../repositories/users.repository.js";
+import { updateUser } from "../services/users.services.js";
+
+export async function updateController(req, res) {
+  const { user, body } = res.locals;
+
+  try {
+    await updateUser(user.id, body, req.file);
+    return res.sendStatus(200);
+  } catch (err) {
+    if (
+      err.constraint === "profiles_user_id_fkey" ||
+      err.constraint === "user_images_user_id_fkey"
+    ) {
+      res.sendStatus(422);
+    }
+
+    console.error(err);
+    return res.status(500).send(err);
+  }
+}
 
 export async function followController(req, res) {
   const { user, id: leaderId } = res.locals;
