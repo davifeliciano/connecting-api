@@ -1,8 +1,9 @@
 import { Router } from "express";
-import multer from "multer";
 import validateAuthentication from "../middlewares/validateAuthentication.js";
 import validateBody from "../middlewares/validateBody.js";
+import validatePostFile from "../middlewares/validatePostFile.js";
 import validateId from "../middlewares/validateId.js";
+import validateListPostsParams from "../middlewares/validateListPostsParams.js";
 import { postSchema } from "../schemas/posts.schemas.js";
 import {
   createPostController,
@@ -10,17 +11,14 @@ import {
   listPostsController,
   unlikePostController,
 } from "../controllers/posts.controllers.js";
-import validateListPostsParams from "../middlewares/validateListPostsParams.js";
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 const postsRouter = Router();
 
 postsRouter.use(validateAuthentication);
 
 postsRouter.post(
   "/",
-  upload.single("image"),
+  validatePostFile,
   validateBody(postSchema),
   createPostController
 );
