@@ -5,15 +5,38 @@ class UserRepository {
   static async findById(userId) {
     const text = `
       SELECT
-        id,
-        username,
-        email,
-        created_at
-      FROM users
-      WHERE id = $1
+        u.id,
+        p.name,
+        u.username,
+        p.bio,
+        u.created_at,
+        p.updated_at
+      FROM users u
+      JOIN profiles p ON p.user_id = u.id
+      WHERE u.id = $1
     `;
 
     const { rows } = await pool.query(text, [userId]);
+    return rows.length !== 0 ? camelCaseRows(rows)[0] : null;
+  }
+
+  static async findByUsername(username) {
+    const text = `
+      SELECT
+        u.id,
+        p.name,
+        u.username,
+        p.bio,
+        ui.filename,
+        u.created_at,
+        p.updated_at
+      FROM users u
+      JOIN profiles p ON p.user_id = u.id
+      LEFT JOIN user_images ui ON ui.user_id = u.id
+      WHERE u.username = $1
+    `;
+
+    const { rows } = await pool.query(text, [username]);
     return rows.length !== 0 ? camelCaseRows(rows)[0] : null;
   }
 

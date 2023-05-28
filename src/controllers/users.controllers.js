@@ -1,5 +1,21 @@
 import UserRepository from "../repositories/users.repository.js";
-import { getUserFollowers, updateUser } from "../services/users.services.js";
+import {
+  getUserByUsername,
+  getUserFollowers,
+  updateUser,
+} from "../services/users.services.js";
+
+export async function getByUsernameController(req, res) {
+  const { username } = res.locals;
+
+  try {
+    const user = await getUserByUsername(username);
+    return user ? res.send(user) : res.sendStatus(404);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+}
 
 export async function updateController(req, res) {
   const { user, body } = res.locals;
