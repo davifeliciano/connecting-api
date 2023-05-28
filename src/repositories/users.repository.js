@@ -2,6 +2,21 @@ import pool from "../database/pool.js";
 import camelCaseRows from "./utils/camelCaseRows.js";
 
 class UserRepository {
+  static async findById(userId) {
+    const text = `
+      SELECT
+        id,
+        username,
+        email,
+        created_at
+      FROM users
+      WHERE id = $1
+    `;
+
+    const { rows } = await pool.query(text, [userId]);
+    return rows.length !== 0 ? camelCaseRows(rows)[0] : null;
+  }
+
   static async findByUsernameOrEmail(usernameOrEmail) {
     const text = `
       SELECT *
@@ -115,6 +130,42 @@ class UserRepository {
     `;
 
     await pool.query(text, [follower_id, leader_id]);
+  }
+
+  static async getFollowers(userId) {
+    const text = `
+      SELECT
+        u.id,
+        u.username,
+        p.name,
+        ui.filename,
+        u.created_at
+      FROM followers f
+      JOIN users u ON f.follower_id = u.id
+      JOIN profiles p ON p.user_id = u.id
+      LEFT JOIN user_images ui ON ui.user_id = u.id
+      WHERE f.leader_id = $1
+    `;
+
+    const { rows } = await pool.query(text, [userId]);
+    return camelCaseRows(rows);
+  }
+
+  static async getLeaders(userId) {
+    const text = `
+      SELECT
+        u.id,
+        u.username,
+        p.name,
+        u.created_at
+      FROM followers f
+      JOIN users u ON f.leader_id = u.id
+      JOIN profiles p ON p.user_id = u.id
+      WHERE f.follower_id = $1
+    `;
+
+    const { rows } = await pool.query(text, [userId]);
+    return camelCaseRows(rows);
   }
 }
 

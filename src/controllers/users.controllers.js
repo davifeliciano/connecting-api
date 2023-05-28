@@ -1,5 +1,5 @@
 import UserRepository from "../repositories/users.repository.js";
-import { updateUser } from "../services/users.services.js";
+import { getUserFollowers, updateUser } from "../services/users.services.js";
 
 export async function updateController(req, res) {
   const { user, body } = res.locals;
@@ -54,6 +54,38 @@ export async function unfollowController(req, res) {
   try {
     await UserRepository.unfollow(user.id, leaderId);
     return res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+}
+
+export async function getFollowersController(req, res) {
+  const { id: userId } = res.locals;
+
+  try {
+    const followers = await getUserFollowers(userId);
+
+    if (followers.length !== 0) return res.send(followers);
+
+    const leader = await UserRepository.findById(userId);
+    return leader ? res.send([]) : res.sendStatus(404);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+}
+
+export async function getLeadersController(req, res) {
+  const { id: userId } = res.locals;
+
+  try {
+    const leaders = await getUserFollowers(userId);
+
+    if (leaders.length !== 0) return res.send(leaders);
+
+    const follower = await UserRepository.findById(userId);
+    return follower ? res.send([]) : res.sendStatus(404);
   } catch (err) {
     console.error(err);
     return res.status(500).send(err);
