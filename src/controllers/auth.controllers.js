@@ -67,7 +67,7 @@ export async function refreshController(req, res) {
     return res.send({ token: accessToken });
   } catch (err) {
     if (err instanceof RefreshTokenReuseError) {
-      return res.sendStatus(403);
+      return res.sendStatus(401);
     }
 
     console.error(err);
