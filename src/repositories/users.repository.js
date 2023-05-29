@@ -42,8 +42,11 @@ class UserRepository {
 
   static async findByUsernameOrEmail(usernameOrEmail) {
     const text = `
-      SELECT *
-      FROM users
+      SELECT
+        u.*,
+        p.name
+      FROM users u
+      JOIN profiles p ON u.id = p.user_id
       WHERE username = $1 OR email = $1
     `;
 

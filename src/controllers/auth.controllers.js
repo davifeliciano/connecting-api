@@ -29,7 +29,7 @@ export async function registerController(req, res) {
 
 export async function loginController(req, res) {
   try {
-    const { accessToken, refreshToken } = await loginUser(
+    const { accessToken, refreshToken, name, username } = await loginUser(
       res.locals.body,
       req.cookies?.token
     );
@@ -39,7 +39,7 @@ export async function loginController(req, res) {
       maxAge: refreshTokenCookieTTL,
     });
 
-    return res.send({ token: accessToken });
+    return res.send({ name, username, token: accessToken });
   } catch (err) {
     if (err instanceof UserNotFoundError || err instanceof BadPasswordError) {
       return res.sendStatus(401);

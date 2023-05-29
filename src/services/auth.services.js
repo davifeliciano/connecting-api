@@ -58,7 +58,13 @@ export async function loginUser(
   });
 
   await TokensRepository.insert(user.id, refreshToken);
-  return { accessToken, refreshToken };
+
+  return {
+    accessToken,
+    refreshToken,
+    name: user.name,
+    username: user.username,
+  };
 }
 
 export async function refreshUser(id, username, currentRefreshToken) {
