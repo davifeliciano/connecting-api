@@ -3,13 +3,14 @@ import express, { json } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import pool from "./database/pool.js";
+import corsOptions from "./config/corsOptions.js";
 import router from "./routes/index.routes.js";
 
 dotenv.config();
 
 const app = express();
 app.use(json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 await pool.query("SELECT 1 + 1;");
