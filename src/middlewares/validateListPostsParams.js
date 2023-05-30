@@ -9,7 +9,7 @@ export default function validateListPostsParams(req, res, next) {
     author: Joi.string()
       .pattern(/^[\w-]{3,32}$/)
       .message(authorMessage)
-      .required(),
+      .default(false),
     startId: Joi.number().integer().positive().default(false),
     startTimestamp: Joi.date().default(false),
   });
