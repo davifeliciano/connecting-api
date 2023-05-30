@@ -20,7 +20,7 @@ class UserRepository {
     return rows.length !== 0 ? camelCaseRows(rows)[0] : null;
   }
 
-  static async findByUsername(username) {
+  static async findByUsername(userId, username) {
     const text = `
       SELECT
         u.id,
@@ -28,15 +28,35 @@ class UserRepository {
         u.username,
         p.bio,
         ui.filename,
+        (
+          SELECT count(*)
+          FROM posts
+          WHERE author = u.id
+        ) AS posts_count,
+        (
+          SELECT count(*)
+          FROM followers f
+          WHERE f.leader_id = u.id
+        ) AS followers_count,
+        (
+          SELECT count(*)
+          FROM followers f
+          WHERE f.follower_id = u.id
+        ) AS following_count,
+        exists(
+          SELECT 1
+          FROM followers f
+          WHERE f.leader_id = u.id AND f.follower_id = $1
+        ) AS followed,
         u.created_at,
         p.updated_at
       FROM users u
       JOIN profiles p ON p.user_id = u.id
       LEFT JOIN user_images ui ON ui.user_id = u.id
-      WHERE u.username = $1
+      WHERE u.username = $2
     `;
 
-    const { rows } = await pool.query(text, [username]);
+    const { rows } = await pool.query(text, [userId, username]);
     return rows.length !== 0 ? camelCaseRows(rows)[0] : null;
   }
 

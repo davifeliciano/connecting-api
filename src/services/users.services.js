@@ -76,8 +76,8 @@ export async function getUserLeaders(userId) {
   return getUsersImagesUrls(leaders);
 }
 
-export async function getUserByUsername(username) {
-  const user = await UsersRepository.findByUsername(username);
+export async function getUserByUsername(userId, username) {
+  const user = await UsersRepository.findByUsername(userId, username);
   const [userWithImageUrl] = await getUsersImagesUrls([user]);
   return userWithImageUrl;
 }

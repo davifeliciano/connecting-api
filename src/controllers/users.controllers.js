@@ -7,9 +7,10 @@ import {
 
 export async function getByUsernameController(req, res) {
   const { username } = res.locals;
+  const { id } = res.locals.user;
 
   try {
-    const user = await getUserByUsername(username);
+    const user = await getUserByUsername(id, username);
     return user ? res.send(user) : res.sendStatus(404);
   } catch (err) {
     console.error(err);
