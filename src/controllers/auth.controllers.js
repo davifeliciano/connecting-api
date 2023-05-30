@@ -39,7 +39,7 @@ export async function loginController(req, res) {
       maxAge: refreshTokenCookieTTL,
     });
 
-    return res.send({ name, username, token: accessToken });
+    return res.send({ username, token: accessToken });
   } catch (err) {
     if (err instanceof UserNotFoundError || err instanceof BadPasswordError) {
       return res.sendStatus(401);
@@ -64,7 +64,7 @@ export async function refreshController(req, res) {
       maxAge: refreshTokenCookieTTL,
     });
 
-    return res.send({ token: accessToken });
+    return res.send({ username, token: accessToken });
   } catch (err) {
     if (err instanceof RefreshTokenReuseError) {
       return res.sendStatus(401);
