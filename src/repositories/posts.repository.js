@@ -32,40 +32,40 @@ class PostsRepository {
     }
 
     const text = `
-    SELECT
-      p.id,
-      p.caption,
-      p.created_at,
-      pi.filename,
-      json_build_object(
-        'id', u.id,
-        'username', u.username,
-        'filename', ui.filename,
-        'following', exists(
+      SELECT
+        p.id,
+        p.caption,
+        p.created_at,
+        pi.filename,
+        json_build_object(
+          'id', u.id,
+          'username', u.username,
+          'filename', ui.filename,
+          'following', exists(
+            SELECT 1
+            FROM followers f
+            WHERE f.leader_id = p.author AND f.follower_id = $1
+          )
+        ) AS author,
+        (
+          SELECT count(*)::integer
+          FROM post_likes pl
+          WHERE pl.post_id = p.id
+        ) AS likes_count,
+        exists(
           SELECT 1
-			    FROM followers f
-			    WHERE f.leader_id = p.author AND f.follower_id = $1
-        )
-      ) AS author,
-      (
-        SELECT count(*)::integer
-        FROM post_likes pl
-        WHERE pl.post_id = p.id
-      ) AS likes_count,
-      exists(
-        SELECT 1
-        FROM post_likes pl
-        WHERE pl.author = $1 AND pl.post_id = p.id
-      ) AS liked
-    FROM posts p
-    JOIN users u ON u.id = p.author
-    JOIN post_images pi ON pi.post_id = p.id
-    LEFT JOIN user_images ui ON ui.user_id = p.author
-    WHERE ${
-      whereConditions.length !== 0 ? whereConditions.join(" AND ") : "TRUE"
-    }
-    ORDER BY p.created_at DESC, p.id DESC
-    LIMIT 5
+          FROM post_likes pl
+          WHERE pl.author = $1 AND pl.post_id = p.id
+        ) AS liked
+      FROM posts p
+      JOIN users u ON u.id = p.author
+      JOIN post_images pi ON pi.post_id = p.id
+      LEFT JOIN user_images ui ON ui.user_id = p.author
+      WHERE ${
+        whereConditions.length !== 0 ? whereConditions.join(" AND ") : "TRUE"
+      }
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT 5
     `;
 
     const { rows } = await pool.query(text, values);

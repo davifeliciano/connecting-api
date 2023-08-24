@@ -3,12 +3,12 @@ import pool from "../database/pool.js";
 class TokensRepository {
   static async clearIfReused(userId, token) {
     const text = `
-    DELETE FROM tokens
-    WHERE user_id = $1 AND NOT EXISTS(
-      SELECT 1
-      FROM tokens
-      WHERE token = $2
-    )
+      DELETE FROM tokens
+      WHERE user_id = $1 AND NOT EXISTS(
+        SELECT 1
+        FROM tokens
+        WHERE token = $2
+      )
     `;
 
     const values = [userId, token];
