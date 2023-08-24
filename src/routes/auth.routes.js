@@ -11,9 +11,10 @@ import validateRefreshToken from "../middlewares/validateRefreshToken.js";
 
 const authRouter = Router();
 
-authRouter.post("/register", validateBody(registerSchema), registerController);
-authRouter.post("/login", validateBody(loginSchema), loginController);
-authRouter.post("/refresh", validateRefreshToken, refreshController);
-authRouter.post("/logout", logoutController);
+authRouter
+  .post("/register", validateBody(registerSchema), registerController)
+  .post("/login", validateBody(loginSchema), loginController)
+  .post("/refresh", validateRefreshToken, refreshController)
+  .post("/logout", logoutController);
 
 export default authRouter;

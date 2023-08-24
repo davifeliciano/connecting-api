@@ -16,15 +16,15 @@ const postsRouter = Router();
 
 postsRouter.use(validateAuthentication);
 
-postsRouter.post(
-  "/",
-  validatePostFile(true),
-  validateBody(postSchema),
-  createPostController
-);
-
-postsRouter.post("/:id/like", validateId, likePostController);
-postsRouter.post("/:id/unlike", validateId, unlikePostController);
-postsRouter.get("/", validateListPostsParams, listPostsController);
+postsRouter
+  .post(
+    "/",
+    validatePostFile(true),
+    validateBody(postSchema),
+    createPostController
+  )
+  .post("/:id/like", validateId, likePostController)
+  .post("/:id/unlike", validateId, unlikePostController)
+  .get("/", validateListPostsParams, listPostsController);
 
 export default postsRouter;

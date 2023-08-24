@@ -16,17 +16,18 @@ import {
 
 const usersRouter = Router();
 
-usersRouter.use(validateAuthentication);
-usersRouter.get("/:username", validateUsername, getByUsernameController);
-usersRouter.get("/:id/followers", validateId, getFollowersController);
-usersRouter.get("/:id/following", validateId, getLeadersController);
-usersRouter.post("/:id/follow", validateId, followController);
-usersRouter.post("/:id/unfollow", validateId, unfollowController);
-usersRouter.put(
-  "/me",
-  validatePostFile(),
-  validateBody(profileSchema),
-  updateController
-);
+usersRouter
+  .use(validateAuthentication)
+  .get("/:username", validateUsername, getByUsernameController)
+  .get("/:id/followers", validateId, getFollowersController)
+  .get("/:id/following", validateId, getLeadersController)
+  .post("/:id/follow", validateId, followController)
+  .post("/:id/unfollow", validateId, unfollowController)
+  .put(
+    "/me",
+    validatePostFile(),
+    validateBody(profileSchema),
+    updateController
+  );
 
 export default usersRouter;
