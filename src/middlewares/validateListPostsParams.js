@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 import Joi from "joi";
 
 export default function validateListPostsParams(req, res, next) {
@@ -18,7 +19,7 @@ export default function validateListPostsParams(req, res, next) {
 
   if (error) {
     const details = error.details.map((detail) => detail.message);
-    return res.status(422).send({ details });
+    return res.status(httpStatus.UNPROCESSABLE_ENTITY).send({ details });
   }
 
   res.locals.listOptions = value;

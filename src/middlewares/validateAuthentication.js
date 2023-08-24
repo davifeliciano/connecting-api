@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 import jwt from "jsonwebtoken";
 
 export default function validateAuthentication(req, res, next) {
@@ -8,7 +9,7 @@ export default function validateAuthentication(req, res, next) {
     const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
     res.locals.user = user;
   } catch (err) {
-    return res.sendStatus(401);
+    return res.sendStatus(httpStatus.UNAUTHORIZED);
   }
 
   next();

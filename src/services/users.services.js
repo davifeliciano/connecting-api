@@ -4,6 +4,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { bucketName, client } from "../aws/s3.js";
 import UsersRepository from "../repositories/users.repository.js";
 import editImage from "./utils/editImage.js";
+import NotFoundError from "../errors/NotFoundError.js";
+import BadRequestError from "../errors/BadRequestError.js";
+import ConflictError from "../errors/ConflictError.js";
 
 async function putUserImage(file) {
   if (!file) return;
@@ -23,7 +26,7 @@ async function putUserImage(file) {
   return filename;
 }
 
-export async function updateUser(userId, { name, bio }, file) {
+export async function updateUser(userId, name, bio, file) {
   const filename = await putUserImage(file);
   await UsersRepository.update(userId, name, bio, filename);
 }
@@ -68,16 +71,63 @@ async function getUsersImagesUrls(users) {
 
 export async function getUserFollowers(userId) {
   const followers = await UsersRepository.getFollowers(userId);
-  return getUsersImagesUrls(followers);
+
+  if (followers.length !== 0) {
+    return getUsersImagesUrls(followers);
+  }
+
+  const leader = await UsersRepository.findById(userId);
+
+  if (!leader) {
+    throw new NotFoundError("User not found");
+  }
 }
 
 export async function getUserLeaders(userId) {
   const leaders = await UsersRepository.getLeaders(userId);
-  return getUsersImagesUrls(leaders);
+
+  if (leaders.length !== 0) {
+    return getUsersImagesUrls(leaders);
+  }
+
+  const follower = await UsersRepository.findById(userId);
+
+  if (!follower) {
+    throw new NotFoundError("User not found");
+  }
 }
 
 export async function getUserByUsername(userId, username) {
   const user = await UsersRepository.findByUsername(userId, username);
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
   const [userWithImageUrl] = await getUsersImagesUrls([user]);
   return userWithImageUrl;
+}
+
+export async function followUser(followerId, leaderId) {
+  try {
+    await UsersRepository.follow(followerId, leaderId);
+  } catch (err) {
+    if (err.constraint === "followers_check") {
+      throw new BadRequestError("A user cannot follow himself");
+    }
+
+    if (err.constraint === "followers_leader_id_follower_id_key") {
+      throw new ConflictError("You already follow this user");
+    }
+
+    if (err.constraint === "followers_leader_id_fkey") {
+      throw new NotFoundError("User not found");
+    }
+
+    throw err;
+  }
+}
+
+export async function unfollowUser(followerId, leaderId) {
+  await UsersRepository.unfollow(followerId, leaderId);
 }

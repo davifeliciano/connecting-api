@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import pool from "./database/pool.js";
 import corsOptions from "./config/corsOptions.js";
 import router from "./routes/index.routes.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ await pool.query("SELECT 1 + 1;");
 console.log("Succesfully connected to database");
 
 app.use(router);
+app.use(errorHandler);
 
 const port = process.env.PORT ?? 5000;
 app.listen(port, () => {

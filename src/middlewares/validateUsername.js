@@ -1,4 +1,5 @@
 import Joi from "joi";
+import NotFoundError from "../errors/NotFoundError.js";
 
 export default function validateUsername(req, res, next) {
   const { username } = req.params;
@@ -10,7 +11,7 @@ export default function validateUsername(req, res, next) {
   const { error, value } = usernameSchema.validate(username);
 
   if (error) {
-    return res.sendStatus(404);
+    throw new NotFoundError("User not found");
   }
 
   res.locals.username = value;

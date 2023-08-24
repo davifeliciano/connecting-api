@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import tokenCookieOptions from "../config/tokenCookieOptions.js";
+import httpStatus from "http-status";
 
 export default function validateRefreshToken(req, res, next) {
   try {
@@ -13,8 +14,7 @@ export default function validateRefreshToken(req, res, next) {
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
       res.clearCookie("token", tokenCookieOptions);
-
-      return res.sendStatus(401);
+      return res.sendStatus(httpStatus.UNAUTHORIZED);
     }
   }
 }

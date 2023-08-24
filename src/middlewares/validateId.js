@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 import Joi from "joi";
 
 export default function validateId(req, res, next) {
@@ -7,7 +8,7 @@ export default function validateId(req, res, next) {
   const { error, value } = idSchema.validate(id);
 
   if (error) {
-    return res.sendStatus(404);
+    return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 
   res.locals.id = value;

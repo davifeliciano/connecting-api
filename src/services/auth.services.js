@@ -1,38 +1,44 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import UserRepository from "../repositories/users.repository.js";
-import UserNotFoundError from "../errors/UserNotFoundError.js";
-import BadPasswordError from "../errors/BadPasswordError.js";
+import UsersRepository from "../repositories/users.repository.js";
+import ConflictError from "../errors/ConflictError.js";
 import TokensRepository from "../repositories/tokens.repository.js";
 import RefreshTokenReuseError from "../errors/RefreshTokenReuseError.js";
 import { accessTokenTTL, refreshTokenTTL } from "../config/tokensTTL.js";
+import LoginError from "../errors/LoginError.js";
 
 const SALT_ROUNDS = 10;
 
-export async function registerUser(
-  { name, username, email, password },
-  currentRefreshToken
-) {
+export async function registerUser({ name, username, email, password }) {
   const passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
-  await UserRepository.insert(name, username, email, passwordHash);
+
+  try {
+    await UsersRepository.insert(name, username, email, passwordHash);
+  } catch (err) {
+    if (err.constraint === "users_email_key") {
+      throw new ConflictError(
+        "There is already an user registered with this email"
+      );
+    }
+
+    if (err.constraint === "users_username_key") {
+      throw new ConflictError(
+        "There is already an user registered with this username"
+      );
+    }
+
+    throw err;
+  }
 }
 
 export async function loginUser(
   { emailOrUsername, password },
   currentRefreshToken
 ) {
-  const user = await UserRepository.findByUsernameOrEmail(emailOrUsername);
+  const user = await UsersRepository.findByUsernameOrEmail(emailOrUsername);
 
-  if (!user) {
-    throw new UserNotFoundError(
-      `No user found with username or email ${emailOrUsername}`
-    );
-  }
-
-  if (!bcrypt.compareSync(password, user.password)) {
-    throw new BadPasswordError(
-      `Invalid password for username or email ${emailOrUsername}`
-    );
+  if (!user || !bcrypt.compareSync(password, user.password)) {
+    throw new LoginError(`Authentication failed for user ${emailOrUsername}`);
   }
 
   if (currentRefreshToken) {

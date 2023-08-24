@@ -1,7 +1,7 @@
 import pool from "../database/pool.js";
 import camelCaseRows from "./utils/camelCaseRows.js";
 
-class UserRepository {
+class UsersRepository {
   static async findById(userId) {
     const text = `
       SELECT
@@ -215,4 +215,4 @@ class UserRepository {
   }
 }
 
-export default UserRepository;
+export default UsersRepository;
