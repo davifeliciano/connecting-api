@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import express, { json } from "express";
+import "express-async-errors";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import pool from "./database/pool.js";
