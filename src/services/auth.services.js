@@ -10,7 +10,7 @@ import LoginError from "../errors/LoginError.js";
 const SALT_ROUNDS = 10;
 
 export async function registerUser({ name, username, email, password }) {
-  const passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
   try {
     await UsersRepository.insert(name, username, email, passwordHash);
@@ -37,7 +37,7 @@ export async function loginUser(
 ) {
   const user = await UsersRepository.findByUsernameOrEmail(emailOrUsername);
 
-  if (!user || !bcrypt.compareSync(password, user.password)) {
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     throw new LoginError(`Authentication failed for user ${emailOrUsername}`);
   }
 
