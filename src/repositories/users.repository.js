@@ -171,7 +171,7 @@ class UsersRepository {
 
   static async unfollow(follower_id, leader_id) {
     const text = `
-      REMOVE FROM followers
+      DELETE FROM followers
       WHERE follower_id = $1 AND leader_id = $2
     `;
 
