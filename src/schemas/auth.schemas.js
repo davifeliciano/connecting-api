@@ -8,6 +8,7 @@ const messages = {
 };
 
 const emailSchema = Joi.string().email().required();
+
 const usernameSchema = Joi.string()
   .pattern(/^[\w-]{3,32}$/)
   .message(messages.username)
@@ -30,4 +31,4 @@ const loginSchema = Joi.object({
   password: passwordSchema,
 });
 
-export { registerSchema, loginSchema };
+export { usernameSchema, registerSchema, loginSchema };

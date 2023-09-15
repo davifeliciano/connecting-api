@@ -7,7 +7,8 @@ import {
 } from "../services/posts.services.js";
 
 export async function listPostsController(req, res) {
-  const { user, listOptions } = res.locals;
+  const { user } = res.locals;
+  const listOptions = res.locals.query;
   const posts = await listPosts(user.id, listOptions);
   return res.send(posts);
 }
@@ -20,13 +21,15 @@ export async function createPostController(req, res) {
 }
 
 export async function likePostController(req, res) {
-  const { user, id } = res.locals;
-  await likePost(user.id, id);
+  const { user, params } = res.locals;
+  const postId = params.id;
+  await likePost(user.id, postId);
   return res.send();
 }
 
 export async function unlikePostController(req, res) {
-  const { user, id } = res.locals;
-  await unlikePost(user.id, id);
+  const { user, params } = res.locals;
+  const postId = params.id;
+  await unlikePost(user.id, postId);
   return res.send();
 }
