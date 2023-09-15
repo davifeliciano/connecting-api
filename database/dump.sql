@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.8
--- Dumped by pg_dump version 14.8
+-- Dumped from database version 14.9
+-- Dumped by pg_dump version 14.9
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -28,7 +28,8 @@ CREATE TABLE public.comments (
     id integer NOT NULL,
     author integer,
     post_id integer NOT NULL,
-    content character varying(64)
+    content character varying(256),
+    created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -83,6 +84,37 @@ CREATE SEQUENCE public.followers_id_seq
 --
 
 ALTER SEQUENCE public.followers_id_seq OWNED BY public.followers.id;
+
+
+--
+-- Name: pgmigrations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pgmigrations (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    run_on timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: pgmigrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pgmigrations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pgmigrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pgmigrations_id_seq OWNED BY public.pgmigrations.id;
 
 
 --
@@ -326,6 +358,13 @@ ALTER TABLE ONLY public.followers ALTER COLUMN id SET DEFAULT nextval('public.fo
 
 
 --
+-- Name: pgmigrations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pgmigrations ALTER COLUMN id SET DEFAULT nextval('public.pgmigrations_id_seq'::regclass);
+
+
+--
 -- Name: post_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -396,6 +435,14 @@ ALTER TABLE ONLY public.followers
 
 ALTER TABLE ONLY public.followers
     ADD CONSTRAINT followers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pgmigrations
+    ADD CONSTRAINT pgmigrations_pkey PRIMARY KEY (id);
 
 
 --
@@ -487,10 +534,17 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: posts_keyset_index; Type: INDEX; Schema: public; Owner: -
+-- Name: comments_keyset_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX posts_keyset_index ON public.posts USING btree (id, created_at, caption);
+CREATE INDEX comments_keyset_idx ON public.comments USING btree (created_at DESC, id DESC, content);
+
+
+--
+-- Name: posts_keyset_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX posts_keyset_idx ON public.posts USING btree (created_at DESC, id DESC, caption);
 
 
 --

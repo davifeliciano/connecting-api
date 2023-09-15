@@ -8,7 +8,7 @@
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "npx node-pg-migrate --envPath .env -m database/migrations"
+    "migrate": "npx node-pg-migrate --envPath .env -m database/migrations --single-transaction false"
   },
   "keywords": [
     "Social network",
