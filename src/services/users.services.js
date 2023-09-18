@@ -5,8 +5,8 @@ import { bucketName, client } from "../aws/s3.js";
 import UsersRepository from "../repositories/users.repository.js";
 import editImage from "./utils/editImage.js";
 import NotFoundError from "../errors/NotFoundError.js";
-import BadRequestError from "../errors/BadRequestError.js";
 import ConflictError from "../errors/ConflictError.js";
+import ForbbidenError from "../errors/ForbbidenError.js";
 
 async function putUserImage(file) {
   if (!file) return;
@@ -113,7 +113,7 @@ export async function followUser(followerId, leaderId) {
     await UsersRepository.follow(followerId, leaderId);
   } catch (err) {
     if (err.constraint === "followers_check") {
-      throw new BadRequestError("A user cannot follow himself");
+      throw new ForbbidenError("A user cannot follow himself");
     }
 
     if (err.constraint === "followers_leader_id_follower_id_key") {
