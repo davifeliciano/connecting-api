@@ -1,20 +1,15 @@
 import Joi from "joi";
+import authorSchema from "./common/author.schemas.js";
+import paginationQuerySchema from "./common/pagination.schemas.js";
 
 const postSchema = Joi.object({
   caption: Joi.string().max(1500).required(),
 });
 
-const authorMessage =
-  '"author" must have between 3 and 32 characters (letters, numbers, - and _ are allowed)';
-
 const listPostsQuerySchema = Joi.object({
+  ...paginationQuerySchema,
   following: Joi.boolean().default(false),
-  author: Joi.string()
-    .pattern(/^[\w-]{3,32}$/)
-    .message(authorMessage)
-    .default(false),
-  startId: Joi.number().integer().positive().default(false),
-  startTimestamp: Joi.date().default(false),
+  author: authorSchema,
 });
 
 export { postSchema, listPostsQuerySchema };

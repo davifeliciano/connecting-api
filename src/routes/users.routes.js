@@ -15,7 +15,7 @@ import {
   updateController,
 } from "../controllers/users.controllers.js";
 import validateParams from "../middlewares/validateParams.js";
-import idParamsSchema from "../schemas/common/idParams.schema.js";
+import { idParamsSchema } from "../schemas/common/id.schemas.js";
 
 const usersRouter = Router();
 
