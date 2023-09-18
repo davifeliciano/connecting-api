@@ -3,10 +3,11 @@ import validateAuthentication from "../middlewares/validateAuthentication.js";
 import validateBody from "../middlewares/validateBody.js";
 import validatePostFile from "../middlewares/validateUploadedFile.js";
 import validateParams from "../middlewares/validateParams.js";
-import idParamsSchema from "../schemas/common/idParams.schema.js";
+import { idParamsSchema } from "../schemas/common/id.schemas.js";
 import { listPostsQuerySchema, postSchema } from "../schemas/posts.schemas.js";
 import {
   createPostController,
+  getPostByIdController,
   likePostController,
   listPostsController,
   unlikePostController,
@@ -14,6 +15,8 @@ import {
 import validateQuery from "../middlewares/validateQuery.js";
 
 const postsRouter = Router();
+
+const validateId = validateParams(idParamsSchema);
 
 postsRouter.use(validateAuthentication);
 
@@ -24,8 +27,9 @@ postsRouter
     validateBody(postSchema),
     createPostController
   )
-  .post("/:id/like", validateParams(idParamsSchema), likePostController)
-  .post("/:id/unlike", validateParams(idParamsSchema), unlikePostController)
-  .get("/", validateQuery(listPostsQuerySchema), listPostsController);
+  .post("/:id/like", validateId, likePostController)
+  .post("/:id/unlike", validateId, unlikePostController)
+  .get("/", validateQuery(listPostsQuerySchema), listPostsController)
+  .get("/:id", validateId, getPostByIdController);
 
 export default postsRouter;

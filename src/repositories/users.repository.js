@@ -179,6 +179,7 @@ class UsersRepository {
   }
 
   static async getFollowers(userId) {
+    // TODO: Pagination
     const text = `
       SELECT
         u.id,
@@ -198,6 +199,7 @@ class UsersRepository {
   }
 
   static async getLeaders(userId) {
+    // TODO: Pagination
     const text = `
       SELECT
         u.id,

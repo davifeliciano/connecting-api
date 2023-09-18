@@ -26,7 +26,7 @@ class PostsRepository {
         exists(
           SELECT 1
           FROM followers f
-          WHERE f.leader_id = p.author AND f.follower_id = 1
+          WHERE f.leader_id = p.author AND f.follower_id = $1
         )
       `);
     }
@@ -70,6 +70,44 @@ class PostsRepository {
 
     const { rows } = await pool.query(text, values);
     return camelCaseRows(rows);
+  }
+
+  static async getById(userId, postId) {
+    const text = `
+      SELECT
+        p.id,
+        p.caption,
+        p.created_at,
+        pi.filename,
+        json_build_object(
+          'id', u.id,
+          'username', u.username,
+          'filename', ui.filename,
+          'following', exists(
+            SELECT 1
+            FROM followers f
+            WHERE f.leader_id = p.author AND f.follower_id = $1
+          )
+        ) AS author,
+        (
+          SELECT count(*)::integer
+          FROM post_likes pl
+          WHERE pl.post_id = p.id
+        ) AS likes_count,
+        exists(
+          SELECT 1
+          FROM post_likes pl
+          WHERE pl.author = $1 AND pl.post_id = p.id
+        ) AS liked
+      FROM posts p
+      JOIN users u ON u.id = p.author
+      JOIN post_images pi ON pi.post_id = p.id
+      LEFT JOIN user_images ui ON ui.user_id = p.author
+      WHERE p.id = $2
+    `;
+
+    const { rows } = await pool.query(text, [userId, postId]);
+    return rows.length !== 0 ? camelCaseRows(rows)[0] : null;
   }
 
   static async insert(userId, caption, filename) {
