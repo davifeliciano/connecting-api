@@ -1,5 +1,7 @@
 # connecting-api
 
+https://github.com/davifeliciano/connecting-api/assets/26972046/386ddf5b-edd1-49c1-8b3b-23dcee79b261
+
 Backend for a simple picture based social network featuring likes, followers,
 comments and hashtags functionality. Images are automatically resized to a
 pre-configured resolution — blurred inline margins are generated, if necessary —
